@@ -1,0 +1,152 @@
+<template>
+    <div>
+        <div class="nav_bar nav_bar-{{type}}">
+            <div class="nav_back" onclick="nativeback">
+                <image class="img" src="{{leftImage}}"></image>
+            </div>
+            <div class="nav_title">
+                <text class="nav_text nav_text-{{type}} nav_text_top-{{nav_text_top}}">{{title}}</text>
+            </div>
+            <div class="nav_right_menu" >
+               <image  if="{{shown}}" onclick="ondropmenu" class="img_menu" src="{{rightImage}}"></image>
+            </div>
+        </div>
+        <div class="nav_line  nav_line-{{type}}"></div>
+
+    </div>
+</template>
+
+<script>
+    require('weex-components');
+var taoguba = require('../taoguba');
+    var navigator = require('@weex-module/navigator')
+    module.exports = {
+        data:{
+            title:'  ',
+            type:0,
+            leftImage:'./image/leftw_0.png',
+            rightImage:'./image/quanq_0.png',
+            shown:false,
+            nav_text_top:0
+
+        },
+        created: function(){
+             this.leftImage = taoguba.getImageUrl(this.leftImage);
+              if (typeof window === 'object') {
+                this.nav_text_top=1;
+              }else{
+                this.nav_text_top=0;
+              }
+        },
+        ready: function () {
+
+
+        },
+
+        methods:{
+            nativeback:function(e) {
+            var params = {
+                   'animated': 'true'
+                 };
+                navigator.pop(params,event => {
+
+                   } );
+            },
+            ondropmenu:function(e) {
+              console.log('navbar == ondropmenu');
+              this._parent.ondropmenu();
+            },
+
+            setLeftImage:function(res) {
+                this.leftImage=res;
+                console.log('navbar == res'+res);
+            },
+
+            setRightImage:function(res) {
+                    this.rightImage=res;
+                    console.log('navbar == res'+res);
+            }
+
+        }
+    }
+</script>
+
+<style>
+.nav_bar{
+    display: flex;
+    flex-direction:row;
+    flex: 1;
+    height:95px;
+}
+
+.nav_bar-0{
+    background-color:#1191f6;
+ }
+ .nav_bar-1{
+    background-color:#192c46;
+ }
+
+.nav_text{
+    font-size:35px;
+    flex: 1;
+    justify-content:center;
+    align-items:center;
+    margin-top: 20px;
+}
+
+.nav_text_top-0{
+  margin-top: 30px;
+}
+
+.nav_text_top-1{
+ margin-top: 1px;
+}
+.nav_text-0{
+    color:#FFFFFF;
+}
+.nav_text-1{
+    color:#55aad8;
+}
+
+.nav_title{
+    flex: 1;
+    margin-left: 10px;
+    margin-right: 10px;
+    justify-content:center;
+    align-items:center;
+}
+
+ .nav_back{
+    margin-left: 10px;
+    justify-content:center;
+    align-items:center;
+    width: 40px;
+ }
+
+ .nav_right_menu{
+     margin-right: 10px;
+     width: 60px;
+    justify-content:center;
+    align-items:center;
+  }
+.img{
+    width:40px;
+    height:40px;
+}
+
+ .img_menu{
+        width:60px;
+        height:20px;
+    }
+.nav_line{
+    height:1px;
+
+}
+
+.nav_line-0{
+   background-color:#D8D8D8;
+}
+.nav_line-1{
+   background-color:#192c46;
+}
+</style>

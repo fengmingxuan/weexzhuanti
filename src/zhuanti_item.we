@@ -1,0 +1,195 @@
+<template>
+    <div onclick="openshuoshuo" ref="{{topicID}}" title="{{subject}}">
+        <div class="item_content">
+            <div class="content_up">
+                   <image if="{{showthumbnail}}" class="icon" src="https://image.taoguba.com.cn{{thumbnail}}"></image>
+                   <text class="subjectClass subjectClass-{{skinType}}">{{subject}} </text>
+             </div>
+            <div class="content_down" >
+                <div class="content_down_left">
+                     <text class="textClass textClass-{{skinType}}">{{formatTime()}}   {{userName}}</text>
+                </div>
+                <div class="content_down_right" obj="{{topicID}}">
+                        <image class="img" src="{{home_dian_zan}}"></image>
+                        <text class="numclass textClass textClass-{{skinType}}">{{usefulNum}}</text>
+                        <image class="img" src="{{home_ping_lun}}"></image>
+                        <text class="numclass textClass textClass-{{skinType}}">{{totalReplyNum}}</text>
+                </div>
+            </div>
+        </div>
+        <div class="lineClass lineClass-{{skinType}}"></div>
+    </div>
+</template>
+
+<script>
+    require('weex-components');
+    var modal = require('@weex-module/modal');
+    var stream = require('@weex-module/stream');
+    var storage = require('@weex-module/storage');
+    var weexEventModule =  require('@weex-module/weexEventModule');
+    var taoguba = require('./taoguba');
+    var navigator = require('@weex-module/navigator')
+    var date = require('./common/date');
+    module.exports = {
+        created:function(){
+            var cskinType = this.$getConfig().skinType;
+            if(cskinType==undefined){
+                cskinType=taoguba.getUrlParam('skinType');
+            }
+            if(cskinType==undefined){
+             cskinType = 0;
+            }
+            this.skinType = cskinType;
+            this.home_dian_zan = taoguba.getImageUrl(this.home_dian_zan);
+            this.home_ping_lun = taoguba.getImageUrl(this.home_ping_lun);
+            if(this.thumbnail.length>0){
+               this.showthumbnail = true;
+            }else{
+               this.showthumbnail = false;
+            }
+
+        },
+        data:{
+          userID:'2',
+          userName:'股天乐',
+          topicID:'1647303',
+          totalReplyNum:'139',
+          subject:'淘县首届实战高峰论坛，专属投资者的大盛会专属投资者的大盛会',
+          postDate:'16-03-17',
+          lastReplyDate:'1490284800000',
+          thumbnail:'/img/forumthumbnail.png',
+          usefulNum:'36',
+          skinType:0,
+          textClass:'dayclass',
+          home_dian_zan:'./image/home_dian_zan.png',
+          home_ping_lun:'./image/home_ping_lun.png',
+          showthumbnail:false
+        },
+        methods:{
+            changeSkin: function(cskinType) {
+
+              if(cskinType==undefined){
+                   cskinType= taoguba.getUrlParam('skinType');
+               }
+               if(cskinType==undefined){
+                   cskinType= 0;
+               }
+               this.skinType = cskinType;
+
+            },
+             openshuoshuo:function(e) {
+                 var topicID = e.target.attr.ref;
+                 var optionJson = {
+                   'TOPIC_ID_KEY': topicID,
+                   'TOPIC_REPLY_ID_KEY': 0,
+
+                     };
+                     if (typeof window === 'object') {
+                     //http://m.taoguba.com.cn/mViewTopic?topicID=1293091&replyID=890&pageNo=1
+                     //https://m.taoguba.com.cn/Article/1657029/1
+                     var params = {
+                            'url': taoguba.getMTaoguba('topicID='+topicID+'&replyID=0&pageNo=1'),
+                            'animated': 'true',
+                      };
+                       navigator.push(params,event => {
+                                  //sunccess
+                            } );
+                     }else{
+                       weexEventModule.startOtherNativeActivity('com.taoguba.app.activity.TaogubaTopicActivity',optionJson);
+                    }
+                },
+             formatTime :function(){
+                var time ;
+                var sortType = this._parent.getCurrentSortType();
+                if(sortType == 1){
+                    time = this.lastReplyDate;
+                }else{
+                    time = this.postDate;
+                }
+                var strTime;
+                 if (typeof window === 'object') {
+                    strTime =  date.formatDate(new Date(time),"yy-MM-dd");
+                 }else{
+                    strTime = weexEventModule.TimeFormate("3", time,"");
+                 }
+
+//                weexEventModule.ShowLogI("","strTime-->:"+strTime);
+                return strTime;
+             }
+        },
+         ready(){
+             this.changeSkin(this.skinType);
+         }
+
+    }
+</script>
+
+<style>
+.item_content{
+      margin: 20px;
+}
+.subjectClass{
+      font-size:35px;
+      width: 650;
+}
+.subjectClass-0{
+      color:#666666;
+}
+.subjectClass-1{
+      color:#999999;
+}
+.textClass{
+    font-size:26px;
+}
+.textClass-0{
+     color:#BBBBBB;
+}
+.textClass-1{
+     color:#666666;
+}
+.lineClass{
+    height: 2px;
+}
+.lineClass-0{
+       background-color: #eeeeee;
+}
+.lineClass-1{
+       background-color: #0e1929;
+}
+.content_up{
+    display: flex;
+    flex-direction: row;
+    justify-content:flex-start;
+    width: 750;
+}
+.content_down{
+    margin-top:30px;
+    flex-direction:row;
+}
+.content_down_left{
+
+}
+.content_down_right{
+    flex:1;
+    flex-direction:row;
+    justify-content:flex-end;
+}
+.img{
+    width:40px;
+    height:40px;
+    margin-left: 30px;
+
+
+}
+
+.icon{
+    width:40px;
+    height:40px;
+    top: 1;
+    right: 10;
+}
+.numclass{
+    margin-left: 10px;
+    margin-top: 7px;
+}
+</style>
