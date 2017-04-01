@@ -1,9 +1,8 @@
 var BASE_URL = {
-    IP:'192.168.1.15',
+    //js.taoguba.com.cn/weex/zhuanti  192.168.1.10:8080   192.168.1.15:8080  192.168.1.18:8080
+    IP:'192.168.1.15:8080',
     HTTP:'http://',
-    PORT:'8080',
-    ONLINE_DIR:'taogubaweexzhuanti',
-    API_URL:'http://api.taoguba.cu/',
+    API_URL:'https://api.taoguba.sp/',
     M_TAOGUBA:'https://m.taoguba.com.cn/mViewTopic?'
 };
 
@@ -21,12 +20,12 @@ var API = {
 
 exports.getImageUrl = function (path) {
     var url;
-    path = new String(path);
+    //path = new String(path);
     if (typeof window === 'object') {
         //https://www.taoguba.com.cn/taogubaweexzhuanti/dist/image/leftw_0.png
         //http://191.1.68.1.15:8080/dist/image/leftw_0.png
         //./image/leftw_0.png
-        url =  BASE_URL.HTTP+  BASE_URL.IP+':'+BASE_URL.PORT + '/dist'+path.substring(1, path.length);
+        url =  BASE_URL.HTTP+  BASE_URL.IP+'/dist'+path.substring(1, path.length);
     } else {
         url = path;
     }
@@ -80,7 +79,7 @@ exports.getFocusList = function () {
 
 
 function getBaseUrl(bundleUrl, isnav) {
-    bundleUrl = new String(bundleUrl);
+    //bundleUrl = new String(bundleUrl);
     var nativeBase;
     var isAndroidAssets = bundleUrl.indexOf('file://assets/') >= 0;
 
@@ -93,7 +92,7 @@ function getBaseUrl(bundleUrl, isnav) {
     }
     else {
         //'localhost:8080';
-        var host = BASE_URL.IP+':'+BASE_URL.PORT;
+        var host = BASE_URL.IP;
         var matches = /\/\/([^\/]+?)\//.exec(bundleUrl);
         if (matches && matches.length >= 2) {
             host = matches[1];
@@ -103,9 +102,9 @@ function getBaseUrl(bundleUrl, isnav) {
         //网页 http://localhost:8080/index.html?page=./dist/weexbar/stocknews.js?id=id
         //android 原生 http://192.168.1.15:12580/dist/mainlist.js
         if (typeof window === 'object') {
-            nativeBase = isnav ? 'http://' + host + '/index.html?page=./dist/' : '/dist/';
+            nativeBase = isnav ? BASE_URL.HTTP + host + '/index.html?page=./dist/' : '/dist/';
         } else {
-            nativeBase = 'http://' + host + '/dist/';
+            nativeBase = BASE_URL.HTTP + host + '/dist/';
         }
     }
 
@@ -115,7 +114,7 @@ function getBaseUrl(bundleUrl, isnav) {
 
 function getApiUrl(apiurl){
     var url;
-    apiurl = new String(apiurl);
+    //apiurl = new String(apiurl);
     if (typeof window === 'object') {
         //http://api.taoguba.cu/free/topic/getFocusList
         ///free/topic/apiGetForums?
@@ -137,7 +136,7 @@ exports.getMTaoguba = function getMTaoguba(murl){
     var url;
     ////http://m.taoguba.com.cn/mViewTopic?topicID=1293091&replyID=890&pageNo=1
     //https://m.taoguba.com.cn/Article/1657029/1
-    murl = new String(murl);
+    // murl = new String(murl);
     url =  BASE_URL.M_TAOGUBA+murl;
     console.log('getMTaoguba=='+url);
     return url;

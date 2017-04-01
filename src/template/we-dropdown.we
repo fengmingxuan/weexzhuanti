@@ -4,7 +4,7 @@
             <content></content>
         </div>
 
-        <div class="options options-{{type}}" id="options">
+        <div class="options options-{{type}} optionsos-{{platform}}" id="options">
             <div repeat="{{status}}" class="cell cell_border-color-{{type}}" vid="{{id}}" onclick="onItemClick">
                 <text class="name name-{{type}} {{id==statusId?'current': ''}}">{{name}}</text>
                 <image class="icon-curr-flag" src="{{flagSrc}}" if="{{id==statusId}}"></image>
@@ -34,6 +34,14 @@
     top: -181;
     width: 750;
     transform-origin: center center;
+}
+
+.optionsos-0{
+  top: -181;
+}
+
+.optionsos-1{
+    top: -281;
 }
 
 .options-0 {
@@ -100,14 +108,26 @@
             status: [
                 {id: '0', name: '按回帖时间'},
                 {id: '1', name: '按发帖时间'}
-
-
             ],
             type:0,
-              flagSrc: 'https://gw.alicdn.com/tps/TB11a2lKFXXXXbVXpXXXXXXXXXX-32-32.png',
-               arrowSrc: 'https://gw.alicdn.com/tps/TB1O3_aKFXXXXXdXVXXXXXXXXXX-27-23.png'
+            flagSrc: 'https://gw.alicdn.com/tps/TB11a2lKFXXXXbVXpXXXXXXXXXX-32-32.png',
+            arrowSrc: 'https://gw.alicdn.com/tps/TB1O3_aKFXXXXXdXVXXXXXXXXXX-27-23.png',
+            platform:0
 
         },
+
+        created: function(){
+             var self = this;
+             var platformos = self.$getConfig().env.platform;
+             if(platformos==undefined){
+                self.platform = 0;
+             }
+             if(platformos=='iOS'){
+                  self.platform = 1;
+             }else{
+                  self.platform = 0;
+             }
+         },
         computed: {
             statusName: {
                 get: function(){

@@ -97,8 +97,8 @@
 	    "click": "openzhuanti"
 	  },
 	  "attr": {
-	    "ref": function () {return this.seq},
-	    "title": function () {return this.name}
+	    "ref": function () {return this.hotitem.seq},
+	    "title": function () {return this.hotitem.name}
 	  },
 	  "children": [
 	    {
@@ -119,7 +119,7 @@
 	                "img-left"
 	              ],
 	              "attr": {
-	                "src": function () {return 'https://image.taoguba.com.cn' + (this.imgurl)}
+	                "src": function () {return 'https://image.taoguba.com.cn' + (this.getImageurl())}
 	              }
 	            }
 	          ]
@@ -140,7 +140,7 @@
 	                  "type": "text",
 	                  "classList": function () {return ['textClass-' + (this.skinType)]},
 	                  "attr": {
-	                    "value": function () {return this.name}
+	                    "value": function () {return this.hotitem.name}
 	                  }
 	                }
 	              ]
@@ -155,7 +155,7 @@
 	                  "type": "text",
 	                  "classList": function () {return ['numclass-' + (this.skinType)]},
 	                  "attr": {
-	                    "value": function () {return (this.topicReplyNum) + '讨论  ' + (this.topicViewNum) + '阅读'}
+	                    "value": function () {return (this.hotitem.topicReplyNum) + '讨论  ' + (this.hotitem.topicViewNum) + '阅读'}
 	                  }
 	                }
 	              ]
@@ -166,7 +166,7 @@
 	    },
 	    {
 	      "type": "div",
-	      "classList": function () {return ['lineClass_0-' + (this.skinType)]}
+	      "classList": function () {return ['lineClass-' + (this.skinType)]}
 	    }
 	  ]
 	}
@@ -273,16 +273,26 @@
 	        this.skinType = cskinType;
 	    },
 	    data: function () {return {
-	        "seq": 48,
-	        "name": "是框框伤口上渴",
-	        "imgurl": "/img/2016/06/28/5idxarp0p8zi.jpg",
-	        "postDate": 1490087455000,
-	        "sortNum": 0,
-	        "topicReplyNum": 15500,
-	        "topicViewNum": 1826650,
+	        hotitem: {
+	            "seq": 48,
+	            "name": "是框框伤口上渴",
+	            "imgurl": "/img/2016/06/28/5idxarp0p8zi.jpg",
+	            "postDate": 1490087455000,
+	            "sortNum": 0,
+	            "topicReplyNum": 15500,
+	            "topicViewNum": 1826650
+	        },
+
 	        skinType: 0
 	    }},
 	    methods: {
+
+	        getImageurl: function getImageurl() {
+	            var oimgurl = this.hotitem.imgurl;
+	            oimgurl = oimgurl.replace('../', './').replace('./', '/');
+	            return oimgurl;
+	        },
+
 	        changeSkin: function changeSkin(skinTypes) {
 	            var cskinType = this.$getConfig().skinType;
 	            if (cskinType == undefined) {
@@ -3130,11 +3140,10 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var BASE_URL = {
-	    IP: '192.168.1.15',
+	    //js.taoguba.com.cn/weex/zhuanti  192.168.1.10:8080   192.168.1.15:8080  192.168.1.18:8080
+	    IP: '192.168.1.10:8080',
 	    HTTP: 'http://',
-	    PORT: '8080',
-	    ONLINE_DIR: 'taogubaweexzhuanti',
-	    API_URL: 'http://api.taoguba.cu/',
+	    API_URL: 'http://api.taoguba.sp/',
 	    M_TAOGUBA: 'https://m.taoguba.com.cn/mViewTopic?'
 	};
 
@@ -3149,12 +3158,12 @@
 
 	exports.getImageUrl = function (path) {
 	    var url;
-	    path = new String(path);
+	    //path = new String(path);
 	    if ((typeof window === 'undefined' ? 'undefined' : (0, _typeof3.default)(window)) === 'object') {
 	        //https://www.taoguba.com.cn/taogubaweexzhuanti/dist/image/leftw_0.png
 	        //http://191.1.68.1.15:8080/dist/image/leftw_0.png
 	        //./image/leftw_0.png
-	        url = BASE_URL.HTTP + BASE_URL.IP + ':' + BASE_URL.PORT + '/dist' + path.substring(1, path.length);
+	        url = BASE_URL.HTTP + BASE_URL.IP + '/dist' + path.substring(1, path.length);
 	    } else {
 	        url = path;
 	    }
@@ -3201,7 +3210,7 @@
 	};
 
 	function getBaseUrl(bundleUrl, isnav) {
-	    bundleUrl = new String(bundleUrl);
+	    //bundleUrl = new String(bundleUrl);
 	    var nativeBase;
 	    var isAndroidAssets = bundleUrl.indexOf('file://assets/') >= 0;
 
@@ -3212,7 +3221,7 @@
 	        nativeBase = bundleUrl.substring(0, bundleUrl.lastIndexOf('/') + 1);
 	    } else {
 	        //'localhost:8080';
-	        var host = BASE_URL.IP + ':' + BASE_URL.PORT;
+	        var host = BASE_URL.IP;
 	        var matches = /\/\/([^\/]+?)\//.exec(bundleUrl);
 	        if (matches && matches.length >= 2) {
 	            host = matches[1];
@@ -3222,9 +3231,9 @@
 	        //网页 http://localhost:8080/index.html?page=./dist/weexbar/stocknews.js?id=id
 	        //android 原生 http://192.168.1.15:12580/dist/mainlist.js
 	        if ((typeof window === 'undefined' ? 'undefined' : (0, _typeof3.default)(window)) === 'object') {
-	            nativeBase = isnav ? 'http://' + host + '/index.html?page=./dist/' : '/dist/';
+	            nativeBase = isnav ? BASE_URL.HTTP + host + '/index.html?page=./dist/' : '/dist/';
 	        } else {
-	            nativeBase = 'http://' + host + '/dist/';
+	            nativeBase = BASE_URL.HTTP + host + '/dist/';
 	        }
 	    }
 
@@ -3233,14 +3242,16 @@
 
 	function getApiUrl(apiurl) {
 	    var url;
-	    apiurl = new String(apiurl);
-	    if ((typeof window === 'undefined' ? 'undefined' : (0, _typeof3.default)(window)) === 'object') {
-	        //http://api.taoguba.cu/free/topic/getFocusList
-	        ///free/topic/apiGetForums?
-	        url = BASE_URL.API_URL + apiurl;
-	    } else {
-	        url = apiurl;
-	    }
+	    //apiurl = new String(apiurl);
+	    // if (typeof window === 'object') {
+	    //     //http://api.taoguba.cu/free/topic/getFocusList
+	    //     ///free/topic/apiGetForums?
+	    //     url =  BASE_URL.API_URL+apiurl;
+	    // } else {
+	    //     url = apiurl;
+	    // }
+
+	    url = BASE_URL.API_URL + apiurl;
 	    console.log('getApiUrl==' + url);
 	    return url;
 	};
@@ -3255,7 +3266,7 @@
 	    var url;
 	    ////http://m.taoguba.com.cn/mViewTopic?topicID=1293091&replyID=890&pageNo=1
 	    //https://m.taoguba.com.cn/Article/1657029/1
-	    murl = new String(murl);
+	    // murl = new String(murl);
 	    url = BASE_URL.M_TAOGUBA + murl;
 	    console.log('getMTaoguba==' + url);
 	    return url;
@@ -3267,6 +3278,7 @@
 
 	module.exports = {
 	  "type": "div",
+	  "classList": function () {return ['content_class-' + (this.skinType)]},
 	  "children": [
 	    {
 	      "type": "navbar",
@@ -3314,24 +3326,33 @@
 	        {
 	          "type": "cell",
 	          "append": "tree",
+	          "shown": function () {return this.isdisplay},
 	          "children": [
 	            {
 	              "type": "taoguba-wxc-panel",
 	              "attr": {
 	                "title": "最新热议",
 	                "type": function () {return this.skinType}
-	              },
-	              "shown": function () {return this.isdisplay},
-	              "children": [
-	                {
-	                  "type": "hot_item",
-	                  "id": "sub",
-	                  "repeat": function () {return this.hotArrayTop},
-	                  "attr": {
-	                    "skintype": function () {return this.skinType}
-	                  }
-	                }
-	              ]
+	              }
+	            }
+	          ]
+	        },
+	        {
+	          "type": "cell",
+	          "append": "tree",
+	          "repeat": {
+	            "expression": function () {return this.hotArrayTop},
+	            "value": "hottopitem"
+	          },
+	          "shown": function () {return this.isdisplay},
+	          "children": [
+	            {
+	              "type": "hot_item",
+	              "id": "sub",
+	              "attr": {
+	                "hotitem": function () {return this.hottopitem},
+	                "skintype": function () {return this.skinType}
+	              }
 	            }
 	          ]
 	        },
@@ -3344,17 +3365,25 @@
 	              "attr": {
 	                "title": "往期专题",
 	                "type": function () {return this.skinType}
-	              },
-	              "children": [
-	                {
-	                  "type": "hot_item",
-	                  "id": "sub1",
-	                  "repeat": function () {return this.hotArray},
-	                  "attr": {
-	                    "skintype": function () {return this.skinType}
-	                  }
-	                }
-	              ]
+	              }
+	            }
+	          ]
+	        },
+	        {
+	          "type": "cell",
+	          "append": "tree",
+	          "repeat": {
+	            "expression": function () {return this.hotArray},
+	            "value": "hotitem"
+	          },
+	          "children": [
+	            {
+	              "type": "hot_item",
+	              "id": "sub1",
+	              "attr": {
+	                "hotitem": function () {return this.hotitem},
+	                "skintype": function () {return this.skinType}
+	              }
 	            }
 	          ]
 	        },
@@ -3421,10 +3450,10 @@
 	    "fontSize": 22
 	  },
 	  "refresh-arrow-0": {
-	    "color": "#000000"
+	    "color": "#BBBBBB"
 	  },
 	  "refresh-arrow-1": {
-	    "color": "#ffffff"
+	    "color": "#666666"
 	  },
 	  "refresh-view-0": {
 	    "width": 750,
@@ -3463,11 +3492,15 @@
 
 	var _typeof3 = _interopRequireDefault(_typeof2);
 
+	var _stringify = __webpack_require__(126);
+
+	var _stringify2 = _interopRequireDefault(_stringify);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	__webpack_require__(73);
-	__webpack_require__(126);
-	__webpack_require__(130);
+	__webpack_require__(128);
+	__webpack_require__(132);
 	__webpack_require__(1);
 
 	var stream = __weex_require__('@weex-module/stream');
@@ -3491,7 +3524,8 @@
 	        showLoading: 'hide',
 	        leftImg: "./image/leftw_0.png",
 	        leftImg1: "./image/leftw_1.png",
-	        screenHeight: 0
+	        screenHeight: 0,
+	        platform: 'unknown'
 	    }},
 
 	    methods: {
@@ -3501,9 +3535,7 @@
 
 	            self.showLoading = 'show';
 	            self.pageNo = self.pageNo + 1;
-	            this.$call('timer', 'setTimeout', function () {
-	                self.showLoading = 'hide';
-	            }, 1000);
+
 	            self.refresh();
 	        },
 	        onrefresh: function onrefresh(e) {
@@ -3525,26 +3557,29 @@
 	            var apiurl = taoguba.getOriginApi();
 	            stream.fetch({
 	                method: 'GET',
-	                url: url + '?pageNo=' + self.pageNo,
-	                body: {
-	                    "url": url,
-	                    "pageNo": self.pageNo
-	                },
-	                headers: {
-	                    'Content-Type': 'application/x-www-form-urlencoded'
-	                }
-
+	                url: url + '?pageNo=' + self.pageNo
 	            }, function (ret) {
+	                var result = (0, _stringify2.default)(ret);
 	                self.showLoading = 'hide';
 	                self.refresh_display = 'hide';
+	                console.log('result  ==' + result);
+
 	                if (!ret.ok) {} else {
 	                    if (self.pageNo == 1) {
 	                        self.hotArray.splice(0, self.hotArray.length);
 	                    }
 	                    self.hotArrayTop.splice(0, self.hotArrayTop.length);
-	                    var json = JSON.parse(ret.data);
+
+	                    var json = ret.data;
+
+	                    if (json && (typeof json === 'undefined' ? 'undefined' : (0, _typeof3.default)(json)) != 'object') {
+	                        try {
+	                            json = eval('(' + ret.data + ')');
+	                        } catch (e) {}
+	                    }
+
 	                    var resultStatus;
-	                    if ((typeof window === 'undefined' ? 'undefined' : (0, _typeof3.default)(window)) === 'object') {
+	                    if ((typeof window === 'undefined' ? 'undefined' : (0, _typeof3.default)(window)) === 'object' || self.platform == 'iOS') {
 	                        if (json && json.status == true) {
 	                            resultStatus = '1';
 	                        } else {
@@ -3588,6 +3623,7 @@
 	    },
 	    created: function created() {
 	        this.screenHeight = this.$getConfig().env.deviceHeight;
+	        this.platform = this.$getConfig().env.platform;
 	        this.leftImg = taoguba.getImageUrl(this.leftImg);
 	        this.leftImg1 = taoguba.getImageUrl(this.leftImg1);
 	        this.refresh();
@@ -3617,9 +3653,25 @@
 /* 126 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(127)
-	var __weex_style__ = __webpack_require__(128)
-	var __weex_script__ = __webpack_require__(129)
+	module.exports = { "default": __webpack_require__(127), __esModule: true };
+
+/***/ },
+/* 127 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var core  = __webpack_require__(16)
+	  , $JSON = core.JSON || (core.JSON = {stringify: JSON.stringify});
+	module.exports = function stringify(it){ // eslint-disable-line no-unused-vars
+	  return $JSON.stringify.apply($JSON, arguments);
+	};
+
+/***/ },
+/* 128 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __weex_template__ = __webpack_require__(129)
+	var __weex_style__ = __webpack_require__(130)
+	var __weex_script__ = __webpack_require__(131)
 
 	__weex_define__('@weex-component/navbar', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -3636,7 +3688,7 @@
 
 
 /***/ },
-/* 127 */
+/* 129 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -3686,13 +3738,13 @@
 	          "classList": [
 	            "nav_right_menu"
 	          ],
+	          "shown": function () {return this.shown},
+	          "events": {
+	            "click": "ondropmenu"
+	          },
 	          "children": [
 	            {
 	              "type": "image",
-	              "shown": function () {return this.shown},
-	              "events": {
-	                "click": "ondropmenu"
-	              },
 	              "classList": [
 	                "img_menu"
 	              ],
@@ -3712,7 +3764,7 @@
 	}
 
 /***/ },
-/* 128 */
+/* 130 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -3761,8 +3813,7 @@
 	    "width": 40
 	  },
 	  "nav_right_menu": {
-	    "marginRight": 10,
-	    "width": 60,
+	    "width": 95,
 	    "justifyContent": "center",
 	    "alignItems": "center"
 	  },
@@ -3786,7 +3837,7 @@
 	}
 
 /***/ },
-/* 129 */
+/* 131 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';
@@ -3848,12 +3899,12 @@
 
 
 /***/ },
-/* 130 */
+/* 132 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(131)
-	var __weex_style__ = __webpack_require__(132)
-	var __weex_script__ = __webpack_require__(133)
+	var __weex_template__ = __webpack_require__(133)
+	var __weex_style__ = __webpack_require__(134)
+	var __weex_script__ = __webpack_require__(135)
 
 	__weex_define__('@weex-component/taoguba-wxc-panel', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -3870,7 +3921,7 @@
 
 
 /***/ },
-/* 131 */
+/* 133 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -3903,7 +3954,7 @@
 	}
 
 /***/ },
-/* 132 */
+/* 134 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -3927,7 +3978,7 @@
 	}
 
 /***/ },
-/* 133 */
+/* 135 */
 /***/ function(module, exports) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';

@@ -1,19 +1,19 @@
 <template>
-    <div onclick="openshuoshuo" ref="{{topicID}}" title="{{subject}}">
+    <div onclick="openshuoshuo" ref="{{zhuantiitem.topicID}}" title="{{zhuantiitem.subject}}">
         <div class="item_content">
             <div class="content_up">
-                   <image if="{{showthumbnail}}" class="icon" src="https://image.taoguba.com.cn{{thumbnail}}"></image>
-                   <text class="subjectClass subjectClass-{{skinType}}">{{subject}} </text>
+                   <image if="{{zhuantiitem.showthumbnail}}" class="icon" src="https://image.taoguba.com.cn{{zhuantiitem.thumbnail}}"></image>
+                   <text class="subjectClass subjectClass-{{skinType}}">{{zhuantiitem.subject}} </text>
              </div>
             <div class="content_down" >
                 <div class="content_down_left">
-                     <text class="textClass textClass-{{skinType}}">{{formatTime()}}   {{userName}}</text>
+                     <text class="textClass textClass-{{skinType}}">{{formatTime()}}   {{zhuantiitem.userName}}</text>
                 </div>
-                <div class="content_down_right" obj="{{topicID}}">
+                <div class="content_down_right" obj="{{zhuantiitem.topicID}}">
                         <image class="img" src="{{home_dian_zan}}"></image>
-                        <text class="numclass textClass textClass-{{skinType}}">{{usefulNum}}</text>
+                        <text class="numclass textClass textClass-{{skinType}}">{{zhuantiitem.usefulNum}}</text>
                         <image class="img" src="{{home_ping_lun}}"></image>
-                        <text class="numclass textClass textClass-{{skinType}}">{{totalReplyNum}}</text>
+                        <text class="numclass textClass textClass-{{skinType}}">{{zhuantiitem.totalReplyNum}}</text>
                 </div>
             </div>
         </div>
@@ -27,6 +27,7 @@
     var stream = require('@weex-module/stream');
     var storage = require('@weex-module/storage');
     var weexEventModule =  require('@weex-module/weexEventModule');
+    var weexNavigator = require('@weex-module/weexNavigatorModule')
     var taoguba = require('./taoguba');
     var navigator = require('@weex-module/navigator')
     var date = require('./common/date');
@@ -42,28 +43,32 @@
             this.skinType = cskinType;
             this.home_dian_zan = taoguba.getImageUrl(this.home_dian_zan);
             this.home_ping_lun = taoguba.getImageUrl(this.home_ping_lun);
-            if(this.thumbnail.length>0){
-               this.showthumbnail = true;
+            if(this.zhuantiitem.thumbnail.length>0){
+               this.zhuantiitem.showthumbnail = true;
             }else{
-               this.showthumbnail = false;
+               this.zhuantiitem.showthumbnail = false;
             }
 
         },
         data:{
-          userID:'2',
-          userName:'股天乐',
-          topicID:'1647303',
-          totalReplyNum:'139',
-          subject:'淘县首届实战高峰论坛，专属投资者的大盛会专属投资者的大盛会',
-          postDate:'16-03-17',
-          lastReplyDate:'1490284800000',
-          thumbnail:'/img/forumthumbnail.png',
-          usefulNum:'36',
+           zhuantiitem:{
+              userID:'2',
+              userName:'股天乐',
+              topicID:'1647303',
+              totalReplyNum:'139',
+              subject:'淘县首届实战高峰论坛，专属投资者的大盛会专属投资者的大盛会',
+              postDate:'16-03-17',
+              lastReplyDate:'1490284800000',
+              thumbnail:'/img/forumthumbnail.png',
+              usefulNum:'36',
+              showthumbnail:false
+           },
+
           skinType:0,
           textClass:'dayclass',
           home_dian_zan:'./image/home_dian_zan.png',
           home_ping_lun:'./image/home_ping_lun.png',
-          showthumbnail:false
+
         },
         methods:{
             changeSkin: function(cskinType) {
@@ -79,22 +84,28 @@
             },
              openshuoshuo:function(e) {
                  var topicID = e.target.attr.ref;
+                  var url = taoguba.getMTaoguba('topicID='+topicID+'&replyID=0&pageNo=1');
                  var optionJson = {
                    'TOPIC_ID_KEY': topicID,
                    'TOPIC_REPLY_ID_KEY': 0,
 
                      };
+                 var params = {
+                             'url': url,
+                             'animated': 'true',
+                             'options':{'skinType':'0'}
+                       };
                      if (typeof window === 'object') {
                      //http://m.taoguba.com.cn/mViewTopic?topicID=1293091&replyID=890&pageNo=1
                      //https://m.taoguba.com.cn/Article/1657029/1
-                     var params = {
-                            'url': taoguba.getMTaoguba('topicID='+topicID+'&replyID=0&pageNo=1'),
-                            'animated': 'true',
-                      };
+
                        navigator.push(params,event => {
                                   //sunccess
                             } );
                      }else{
+//                     weexNavigator.push(params,event => {
+//                                                       //sunccess
+//                                                 } );
                        weexEventModule.startOtherNativeActivity('com.taoguba.app.activity.TaogubaTopicActivity',optionJson);
                     }
                 },
@@ -102,15 +113,16 @@
                 var time ;
                 var sortType = this._parent.getCurrentSortType();
                 if(sortType == 1){
-                    time = this.lastReplyDate;
+                    time = this.zhuantiitem.lastReplyDate;
                 }else{
-                    time = this.postDate;
+                    time = this.zhuantiitem.postDate;
                 }
                 var strTime;
                  if (typeof window === 'object') {
                     strTime =  date.formatDate(new Date(time),"yy-MM-dd");
                  }else{
-                    strTime = weexEventModule.TimeFormate("3", time,"");
+                    //strTime = weexEventModule.TimeFormate("3", time,"");
+                    strTime =  date.formatDate(new Date(time),"yy-MM-dd");
                  }
 
 //                weexEventModule.ShowLogI("","strTime-->:"+strTime);
@@ -185,8 +197,8 @@
 .icon{
     width:40px;
     height:40px;
-    top: 1;
-    right: 10;
+    margin-left: 0px;
+    margin-right: 10px;
 }
 .numclass{
     margin-left: 10px;

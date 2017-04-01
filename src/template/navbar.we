@@ -7,8 +7,8 @@
             <div class="nav_title">
                 <text class="nav_text nav_text-{{type}} nav_text_top-{{nav_text_top}}">{{title}}</text>
             </div>
-            <div class="nav_right_menu" >
-               <image  if="{{shown}}" onclick="ondropmenu" class="img_menu" src="{{rightImage}}"></image>
+            <div class="nav_right_menu" if="{{shown}}" onclick="ondropmenu" >
+               <image  class="img_menu" src="{{rightImage}}"></image>
             </div>
         </div>
         <div class="nav_line  nav_line-{{type}}"></div>
@@ -124,8 +124,7 @@ var taoguba = require('../taoguba');
  }
 
  .nav_right_menu{
-     margin-right: 10px;
-     width: 60px;
+     width: 95px;
     justify-content:center;
     align-items:center;
   }

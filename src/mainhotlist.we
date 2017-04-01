@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="content_class-{{skinType}}">
     <navbar id="sub3" title="热议专题" type="{{skinType}}" shown="{{shown}}" leftImage="{{leftImg}}"></navbar>
     <list class="content_class-{{skinType}}" style="height: {{screenHeight}}">
            <refresh class="refresh-view-{{skinType}}" display="{{refresh_display}}" onrefresh="onrefresh">
@@ -8,17 +8,19 @@
                        下拉刷新
                    </text>
            </refresh>
-           <cell>
-                  <taoguba-wxc-panel title="最新热议" type="{{skinType}}" if="{{isdisplay}}">
-                        <hot_item id="sub" repeat="{{hotArrayTop}}" skinType="{{skinType}}"/>
-                  </taoguba-wxc-panel>
+
+           <cell  if="{{isdisplay}}">
+             <taoguba-wxc-panel title="最新热议" type="{{skinType}}"/>
            </cell>
+           <cell repeat="{{hottopitem in hotArrayTop}}" if="{{isdisplay}}">
+              <hot_item id="sub" hotitem = "{{hottopitem}}" skinType="{{skinType}}"/>
+           </cell>
+
            <cell>
-
-                      <taoguba-wxc-panel title="往期专题" type="{{skinType}}">
-                         <hot_item id="sub1" repeat="{{hotArray}}" skinType="{{skinType}}"/>
-                      </taoguba-wxc-panel>
-
+            <taoguba-wxc-panel title="往期专题" type="{{skinType}}"/>
+           </cell>
+           <cell repeat="{{hotitem in hotArray}}" >
+               <hot_item id="sub1" hotitem="{{hotitem}}" skinType="{{skinType}}"/>
             </cell>
             <loading  class="loading-view loading-view-{{skinType}}" display="{{showLoading}}"  onloading="onloading">
                  <text class="refresh-arrow refresh-arrow-{{skinType}}" if="{{showLoading==='hide'}}">
@@ -36,8 +38,14 @@
      require('./template/navbar.we')
      require('./template/taoguba-wxc-panel.we')
      require('./hot_item.we')
-
+  //检测是否支持某个原生的 module（iOS新版weex代码不支持覆盖weex自带的module类）
+  var stream = require('@weex-module/stream_ios')
+  if (stream) {
+  // 是iOS就不用管了
+  }
+  else {
     var stream = require('@weex-module/stream');
+  }
     var modal = require('@weex-module/modal');
      var weexEventModule =  require('@weex-module/weexEventModule');
        var weexModalUIModule =  require('@weex-module/weexModalUIModule');
@@ -59,6 +67,7 @@
             leftImg:"./image/leftw_0.png",
             leftImg1:"./image/leftw_1.png",
             screenHeight: 0,
+            platform:'unknown'
          },
 
         methods:{
@@ -68,9 +77,9 @@
 //                if(self.refresh_display =='hide' && self.showLoading == 'hide'){
                     self.showLoading = 'show';
                     self.pageNo=self.pageNo+1;
-                    this.$call('timer','setTimeout',function(){
-                          self.showLoading = 'hide';
-                    },1000);
+//                    this.$call('timer','setTimeout',function(){
+//                          self.showLoading = 'hide';
+//                    },1000);
                     self.refresh();
 //                }
             },
@@ -106,8 +115,11 @@
                             }
 
                     },function(ret){
+                        var result = JSON.stringify(ret);
                             self.showLoading = 'hide';
                             self.refresh_display = 'hide';
+                            console.log('result  ==' + result);
+
                             if(!ret.ok){
 //                                modal.toast({'message':'你的手机网络出问题啦!','duration':2});
                             }else{
@@ -115,16 +127,26 @@
                                    self.hotArray.splice(0,self.hotArray.length);
                                 }
                                 self.hotArrayTop.splice(0,self.hotArrayTop.length);
-                                var json = JSON.parse(ret.data);
+                                //var json = tgb600770
+                                //(ret.data);
+                                var json = ret.data;
+                                //是String类型才解析
+                                if (json && typeof(json) != 'object') {
+                                  try {
+                                    json = eval('('+ret.data+')');
+                                  } catch (e) {}
+                                  
+                                }
+                                
                                 var resultStatus;
-                                if (typeof window === 'object') {
+                                if (typeof window === 'object'|| self.platform == 'iOS') {
                                     if(json && json.status==true){
                                        resultStatus = '1';
                                     }else{
                                        resultStatus = '0';
                                     }
                                 }else{
-                                    resultStatus = weexEventModule.isStatus(json.errorCode,json.status);
+                                     resultStatus = weexEventModule.isStatus(json.errorCode,json.status);
                                 }
                                 console.log('resultStatus=='+resultStatus);
                                 if(resultStatus=='1'){
@@ -137,15 +159,15 @@
                                               for(var i = 0;i<json.dto.listFocus.length;i++){
                                                   self.hotArray.push(json.dto.listFocus[i]);
 
-                                              }
-                                        }
-                                    }
-                                }else{
-                                    weexModalUIModule.toast(json.errorMessage);
-                                }
-                            }
-                    });
-               },
+                                             }
+                                       }
+                                   }
+                               }else{
+                                   weexModalUIModule.toast(json.errorMessage);
+                               }
+                           }
+                   });
+              },
 
 
                changeShin: function(cskinType) {
@@ -167,6 +189,7 @@
           },
          created: function(){
                  this.screenHeight = this.$getConfig().env.deviceHeight ;
+                 this.platform = this.$getConfig().env.platform;
                  this.leftImg = taoguba.getImageUrl(this.leftImg);
                  this.leftImg1 = taoguba.getImageUrl(this.leftImg1);
                  this.refresh();
@@ -227,12 +250,12 @@
      font-size:22px;
  }
  .refresh-arrow-0{
-  color: #000000;
-  }
+    color: #BBBBBB;
+}
 
-  .refresh-arrow-1{
-    color: #ffffff;
-    }
+.refresh-arrow-1{
+    color: #666666;
+}
 .refresh-view-0{
     width: 750;
     height: 100;

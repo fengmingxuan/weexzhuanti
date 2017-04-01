@@ -1,17 +1,17 @@
 <template>
-<div  onclick="openzhuanti" ref="{{seq}}" title="{{name}}">
+<div  onclick="openzhuanti" ref="{{hotitem.seq}}" title="{{hotitem.name}}">
       <div class="content">
-            <div class="left"><image class="img-left" src="https://image.taoguba.com.cn{{imgurl}}"></image></div>
+            <div class="left"><image class="img-left" src="https://image.taoguba.com.cn{{getImageurl()}}"></image></div>
             <div class="right" >
                    <div class="up">
-                        <text  class="textClass-{{skinType}}">{{name}}</text>
+                        <text  class="textClass-{{skinType}}">{{hotitem.name}}</text>
                    </div>
                    <div class="down" >
-                         <text class="numclass-{{skinType}}">{{topicReplyNum}}讨论  {{topicViewNum}}阅读</text>
+                         <text class="numclass-{{skinType}}">{{hotitem.topicReplyNum}}讨论  {{hotitem.topicViewNum}}阅读</text>
                    </div>
             </div>
       </div>
-      <div class="lineClass_0-{{skinType}}"></div>
+      <div class="lineClass-{{skinType}}"></div>
 </div>
 </template>
 
@@ -33,16 +33,26 @@
              this.skinType = cskinType;
         },
         data:{
-           "seq": 48,
-           "name": "是框框伤口上渴",
-           "imgurl": "/img/2016/06/28/5idxarp0p8zi.jpg",
-           "postDate": 1490087455000,
-           "sortNum": 0,
-           "topicReplyNum": 15500,
-           "topicViewNum": 1826650,
+            hotitem:{
+               "seq": 48,
+               "name": "是框框伤口上渴",
+               "imgurl": "/img/2016/06/28/5idxarp0p8zi.jpg",
+               "postDate": 1490087455000,
+               "sortNum": 0,
+               "topicReplyNum": 15500,
+               "topicViewNum": 1826650,
+            },
+
            skinType:0
         },
         methods:{
+
+            getImageurl:function() {
+                var oimgurl = this.hotitem.imgurl;
+                oimgurl = oimgurl.replace('../','./').replace('./','/');
+                return oimgurl;
+            },
+
             changeSkin: function(skinTypes) {
                  var cskinType = this.$getConfig().skinType;
                  if(cskinType==undefined){
